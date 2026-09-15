@@ -24,7 +24,7 @@ httpx = ">=0.28.1,<0.29"
 experiment_hub = { path = ".", editable = true }
 
 [tool.pixi.tasks]
-dev = "fastapi dev app/main.py"
+dev = "fastapi dev src/experiment_hub/main.py"
 test = "pytest"
 
 [tool.pytest.ini_options]
