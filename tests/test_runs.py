@@ -171,3 +171,20 @@ def test_patch_finished_run():
 
     assert another_patch_response.status_code == 409
     assert another_patch_response.json()["detail"] == "Run is already finished"
+
+
+def test_get_runs_empty():
+    get_response = client.get("/runs")
+
+    assert get_response.status_code == 200
+    assert get_response.json() == []
+
+
+def test_get_runs():
+    create_run()
+    create_run()
+
+    get_response = client.get("/runs")
+
+    assert get_response.status_code == 200
+    assert len(get_response.json()) == 2

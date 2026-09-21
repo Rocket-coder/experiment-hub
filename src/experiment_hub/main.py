@@ -38,6 +38,11 @@ async def health():
 runs: dict[UUID, Run] = {}
 
 
+@app.get("/runs")
+async def get_runs():
+    return list(runs.values())
+
+
 @app.post("/runs", status_code=201)
 async def create_run(run_create: RunCreate):
     run = Run(
