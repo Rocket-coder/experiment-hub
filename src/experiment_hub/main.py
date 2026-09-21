@@ -3,7 +3,7 @@ from uuid import uuid4, UUID
 from datetime import datetime, timezone
 
 from experiment_hub.models import Run, RunCreate, RunUpdate
-from experiment_hub.storage import runs
+from experiment_hub.storage import save_run, get_run, get_runs
 from experiment_hub.service import update_run, RunNotFoundError, RunAlreadyFinishedError
 
 app = FastAPI()
@@ -21,7 +21,7 @@ async def health():
 
 @app.get("/runs")
 async def get_runs():
-    return list(runs.values())
+    return get_runs()
 
 
 @app.post("/runs", status_code=201)
@@ -34,20 +34,21 @@ async def create_run(run_create: RunCreate):
         parameters = run_create.parameters
     )
 
-    runs[run.run_id] = run
+    save_run(run)
     
-    return run
+    return get_run(run.run_id)
 
 
 @app.get("/runs/{run_id}")
 async def get_run(run_id: UUID):
-    if run_id not in runs:
+    run = get_run(run_id)
+    if run is None:
         raise HTTPException(
             status_code=404,
             detail="Run not found"
         )
 
-    return runs[run_id]
+    return run
 
 
 @app.patch("/runs/{run_id}")
