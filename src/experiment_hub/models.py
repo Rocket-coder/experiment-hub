@@ -15,7 +15,6 @@ class Project(BaseModel):
 
 
 class ExperimentCreate(BaseModel):
-    project_id: UUID
     name: str
 
 

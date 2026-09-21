@@ -3,7 +3,7 @@ from uuid import uuid4, UUID
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
-from experiment_hub.models import Run, RunCreate, RunUpdate
+from experiment_hub.models import Run, RunCreate, RunUpdate, Project, ProjectCreate, Experiment, ExperimentCreate
 from experiment_hub.storage import (
     save_run, 
     get_run as storage_get_run, 
@@ -79,3 +79,58 @@ async def patch_run(run_id: UUID, run_update: RunUpdate):
             status_code=409,
             detail="Run is already finished"
         )
+
+
+@app.post("/projects")
+def add_project(project_create: ProjectCreate):
+    project = Project(
+        project_id=uuid4(),
+        name=project_create.name
+    )
+
+    # TODO: save project to DB
+    # TODO: get project from DB
+    pass
+
+
+@app.get("/projects/{project_id}")
+def get_project(project_id: UUID):
+    # TODO: add storage_get_project(project_id)
+    project = None
+
+    if project is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found"
+        )
+
+    return project
+
+
+@app.post("/projects/{project_id}/experiments")
+def create_experiment(project_id: UUID, experiment_create: ExperimentCreate):
+    project = get_project(project_id)
+    experiments = Experiment(
+        experiment_id=uuid4(),
+        project_id=project_id,
+        name=experiment_create.name
+    )
+
+    # TODO: add experiment to DB
+    # TODO: get experiment from DB
+
+    pass
+
+
+@app.get("/experiments/{experiment_id}")
+def get_experiment(experiment_id: UUID):
+    # TODO: add storage_get_experiment(experiment_id)
+    experiment = None
+
+    if experiment is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Experiment not found"
+        )
+
+    return experiment
