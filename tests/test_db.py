@@ -2,7 +2,6 @@ from uuid import uuid4
 from datetime import datetime, timezone
 
 from experiment_hub import storage
-from experiment_hub.storage import save_run, get_run
 from experiment_hub.models import Run
 
 def test_init_and_save_runs_with_get():
@@ -17,9 +16,9 @@ def test_init_and_save_runs_with_get():
         }
     )
 
-    save_run(run)
+    storage.save_run(run)
 
-    loaded_run = get_run(run.run_id)
+    loaded_run = storage.get_run(run.run_id)
 
     assert loaded_run is not None
 
