@@ -4,8 +4,8 @@ from uuid import uuid4
 from datetime import datetime, timezone
 
 from experiment_hub import storage
-from experiment_hub.models import Run, RunUpdate
-from experiment_hub.service import update_run, RunAlreadyFinishedError
+from experiment_hub.models import Run, RunUpdate, Experiment, Project
+from experiment_hub.service import update_run, create_experiment, RunAlreadyFinishedError, ProjectNotFoundError
 
 
 def test_update_running_to_completed():
@@ -61,3 +61,35 @@ def test_try_to_update_finished_run():
 
     with pytest.raises(RunAlreadyFinishedError):
         update_run(run.run_id, update)
+
+
+def test_create_experiment_with_real_project():
+    project = Project(
+        project_id=uuid4(),
+        name="test project"
+    )
+
+    storage.save_project(project)
+
+    experiment = Experiment(
+        experiment_id=uuid4(),
+        project_id=project.project_id,
+        name="test experiment"
+    )
+
+    saved_experiment = create_experiment(project.project_id, experiment)
+
+    assert saved_experiment.experiment_id == experiment.experiment_id
+    assert saved_experiment.project_id == experiment.project_id
+    assert saved_experiment.name == experiment.name
+
+
+def test_try_to_create_experiment_with_unknown_project():
+    experiment = Experiment(
+        experiment_id=uuid4(),
+        project_id=uuid4(),
+        name="bad test experiment"
+    )
+
+    with pytest.raises(ProjectNotFoundError):
+        create_experiment(experiment.project_id, experiment)
