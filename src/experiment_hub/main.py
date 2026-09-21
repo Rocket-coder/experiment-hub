@@ -1,26 +1,9 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from uuid import uuid4, UUID
 from datetime import datetime, timezone
-from typing import Literal
 
-class RunCreate(BaseModel):
-    program: str
-    parameters: dict[str, int | float]
-
-class Run(BaseModel):
-    run_id: UUID
-    status: Literal["running", "completed", "failed", "cancelled"]
-    start_time: datetime
-    program: str
-    parameters: dict[str, int | float]
-    results: str | None = None
-    end_time: datetime | None = None
-
-
-class RunUpdate(BaseModel):
-    status: Literal["completed", "failed", "cancelled"]
-    results: str | None = None
+from experiment_hub.models import Run, RunCreate, RunUpdate
+from experiment_hub.storage import runs
 
 
 app = FastAPI()
@@ -34,8 +17,6 @@ async def root():
 @app.get("/health")
 async def health():
     return {"status": "ok"}
-
-runs: dict[UUID, Run] = {}
 
 
 @app.get("/runs")

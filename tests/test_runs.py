@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
-from experiment_hub.main import app, runs
+from experiment_hub.main import app
+from experiment_hub.storage import runs
 from uuid import uuid4, UUID
 
 @pytest.fixture(autouse=True)
