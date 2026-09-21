@@ -1,7 +1,7 @@
 from uuid import UUID
 from datetime import datetime, timezone
 
-from experiment_hub.models import Run, RunUpdate, Experiment, ExperimentCreate
+from experiment_hub.models import Run, RunUpdate, Experiment
 from experiment_hub.storage import get_run, update_run_record, get_project, save_experiment
 
 
@@ -43,4 +43,5 @@ def create_experiment(project_id: UUID, experiment: Experiment):
 
     save_experiment(project_id, experiment)
 
+    return experiment
     

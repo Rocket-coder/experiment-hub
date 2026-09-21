@@ -17,7 +17,8 @@ from experiment_hub.service import (
     update_run, 
     create_experiment as service_create_experiment, 
     RunNotFoundError, 
-    RunAlreadyFinishedError
+    RunAlreadyFinishedError,
+    ProjectNotFoundError
 )
 
 
@@ -103,7 +104,7 @@ def add_project(project_create: ProjectCreate):
 
 @app.get("/projects/{project_id}")
 def get_project(project_id: UUID):
-    project = get_project(project_id)
+    project = storage_get_project(project_id)
 
     if project is None:
         raise HTTPException(
@@ -122,9 +123,13 @@ def create_experiment(project_id: UUID, experiment_create: ExperimentCreate):
         name=experiment_create.name
     )
 
-    service_create_experiment(project_id, experiment)
-
-    return storage_get_experiment(experiment.experiment_id)
+    try:
+        return service_create_experiment(project_id, experiment)
+    except ProjectNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found"
+        )
 
 
 @app.get("/experiments/{experiment_id}")
