@@ -81,7 +81,7 @@ async def patch_run(run_id: UUID, run_update: RunUpdate):
         )
 
 
-@app.post("/projects")
+@app.post("/projects", status_code=201)
 def add_project(project_create: ProjectCreate):
     project = Project(
         project_id=uuid4(),
@@ -107,10 +107,10 @@ def get_project(project_id: UUID):
     return project
 
 
-@app.post("/projects/{project_id}/experiments")
+@app.post("/projects/{project_id}/experiments", status_code=201)
 def create_experiment(project_id: UUID, experiment_create: ExperimentCreate):
     project = get_project(project_id)
-    experiments = Experiment(
+    experiment = Experiment(
         experiment_id=uuid4(),
         project_id=project_id,
         name=experiment_create.name
