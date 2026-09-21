@@ -139,7 +139,7 @@ def update_run_record(run: Run):
             (
                 run.status,
                 run.results,
-                run.end_time.isoformat(),
+                run.end_time.isoformat() if run.end_time else None,
                 str(run.run_id)
             )
         )

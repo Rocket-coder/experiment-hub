@@ -16,16 +16,16 @@ class RunAlreadyFinishedError(Exception):
 def update_run(run_id: UUID, run_update: RunUpdate) -> Run:
     run = get_run(run_id)
 
-    if run_id not in run:
+    if run is None:
         raise RunNotFoundError()
 
     if run.status != "running":
         raise RunAlreadyFinishedError()
 
-    run[run_id].status = run_update.status
-    run[run_id].results = run_update.results
-    run[run_id].end_time = datetime.now(timezone.utc)
+    run.status = run_update.status
+    run.results = run_update.results
+    run.end_time = datetime.now(timezone.utc)
 
     update_run_record(run)
 
-    return get_run(run_id)
+    return run
