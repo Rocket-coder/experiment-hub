@@ -34,7 +34,7 @@ def test_create_run():
 
     created_run = create_response.json()
 
-    assert UUID(created_run["run_id"])    
+    UUID(created_run["run_id"])    
     assert created_run["status"] == "running"
     assert created_run["program"] == "test_post.py"
     assert created_run["parameters"] is not None
