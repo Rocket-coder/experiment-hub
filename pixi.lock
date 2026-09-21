@@ -350,7 +350,7 @@ packages:
 - pypi: ./
   name: experiment-hub
   version: 0.1.0
-  sha256: bbd912813350f02b38ec46d8a1016eaf62915dd07ed418243a7b8b53028d6918
+  sha256: 1703f672da29bc6a83db26723dd75ccfefa84745a36e83aa03593c3a48665086
   requires_python: '>=3.11'
 - conda: https://conda.anaconda.org/conda-forge/noarch/fastapi-0.141.1-h76d476e_0.conda
   sha256: e02b67926bf38b65c05761914981939b9f06e252b5a06f4fe1e803c6ba0692a2
