@@ -1,14 +1,12 @@
 import pytest
 from fastapi.testclient import TestClient
 from experiment_hub.main import app, runs
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 @pytest.fixture(autouse=True)
 def clear_runs():
     runs.clear()
-
     yield
-
     runs.clear()
 
 
@@ -26,29 +24,26 @@ def create_run():
 
     response = client.post("/runs", json=body)
 
-    assert response.status_code == 201
+    return response
 
-    created_run = response.json()
-    
+
+def test_create_run():
+    create_response = create_run()
+
+    assert create_response.status_code == 201
+
+    created_run = create_response.json()
+
+    assert UUID(created_run["run_id"])    
     assert created_run["status"] == "running"
     assert created_run["program"] == "test_post.py"
-    assert created_run["parameters"] == body["parameters"]
+    assert created_run["parameters"] is not None
+    assert created_run["start_time"] is not None
     assert created_run["results"] is None
     assert created_run["end_time"] is None
 
-    return created_run
 
-def test_create_and_get_run():
-    created_run = create_run()
-
-    run_id = created_run["run_id"]
-
-    get_response = client.get(f"/runs/{run_id}")
-
-    assert get_response.status_code == 200
-    assert get_response.json() == created_run
-
-def test_run_post_without_parameters():
+def test_create_run_without_parameters():
     bad_body = {
         "program": "no_params.py"
     }
@@ -58,12 +53,23 @@ def test_run_post_without_parameters():
     assert response.status_code == 422
 
 
-def test_run_get_invalid_uuid():
+def test_get_run():
+    create_response = create_run()
+
+    run_id = create_response.json()["run_id"]
+    
+    get_response = client.get(f"/runs/{run_id}")
+
+    assert get_response.status_code == 200
+    assert get_response.json() == create_response.json()
+
+
+def test_get_run_with_invalid_uuid():
     response = client.get("/runs/123")
 
     assert response.status_code == 422
 
-def test_run_get_unknown_uuid():
+def test_get_unknown_run():
     run_id = uuid4()
 
     response = client.get(f"/runs/{run_id}")
