@@ -3,16 +3,22 @@ import pytest
 from uuid import uuid4
 from datetime import datetime, timezone
 
+from experiment_hub import storage
 from experiment_hub.models import Run, RunUpdate
 from experiment_hub.service import update_run, RunAlreadyFinishedError
-from experiment_hub.storage import runs
 
 
 @pytest.fixture(autouse=True)
-def clear_runs():
-    runs.clear()
-    yield
-    runs.clear()
+def test_database(tmp_path, monkeypatch):
+    test_db_path = tmp_path / "runs.db"
+
+    monkeypatch.setattr(
+        storage,
+        "DB_PATH",
+        test_db_path
+    )
+
+    storage.init_db()
 
 
 def test_update_running_to_completed():
@@ -26,7 +32,8 @@ def test_update_running_to_completed():
             "param2": 5.1
         }
     )
-    runs[run.run_id] = run
+
+    storage.save_run(run)
 
     update = RunUpdate(
         status="completed",
@@ -51,7 +58,7 @@ def test_try_to_update_finished_run():
                 "param2": 5.1
             }
         )
-    runs[run.run_id] = run
+    storage.save_run(run)
 
     update = RunUpdate(
         status="completed",

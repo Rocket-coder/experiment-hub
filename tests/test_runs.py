@@ -3,13 +3,19 @@ from fastapi.testclient import TestClient
 from uuid import uuid4, UUID
 
 from experiment_hub.main import app
-from experiment_hub.storage import runs
+from experiment_hub import storage
 
 @pytest.fixture(autouse=True)
-def clear_runs():
-    runs.clear()
-    yield
-    runs.clear()
+def test_database(tmp_path, monkeypatch):
+    test_db_path = tmp_path / "runs.db"
+
+    monkeypatch.setattr(
+        storage,
+        "DB_PATH",
+        test_db_path
+    )
+
+    storage.init_db()
 
 
 client = TestClient(app)
