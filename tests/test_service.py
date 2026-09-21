@@ -8,19 +8,6 @@ from experiment_hub.models import Run, RunUpdate
 from experiment_hub.service import update_run, RunAlreadyFinishedError
 
 
-@pytest.fixture(autouse=True)
-def test_database(tmp_path, monkeypatch):
-    test_db_path = tmp_path / "runs.db"
-
-    monkeypatch.setattr(
-        storage,
-        "DB_PATH",
-        test_db_path
-    )
-
-    storage.init_db()
-
-
 def test_update_running_to_completed():
     run = Run(
         run_id = uuid4(),
