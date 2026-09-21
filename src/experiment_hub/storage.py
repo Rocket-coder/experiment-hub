@@ -5,17 +5,21 @@ from uuid import UUID
 from datetime import datetime
 
 from experiment_hub.models import Run, Project, Experiment
-from experiment_hub.service import check_project
 
 
 DB_PATH = Path("database/runs.db")
 
 
-# Создание таблицы runs
+def get_connection():
+    connection = sqlite3.connect(DB_PATH)
+    connection.execute("PRAGMA foreign_keys = ON")
+    return connection
+
+
 def init_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         # Table runs init
         connection.execute(
             """
@@ -55,7 +59,7 @@ def init_db():
 
 
 def save_project(project: Project):
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         connection.execute(
             """
             INSERT INTO projects (
@@ -72,7 +76,7 @@ def save_project(project: Project):
 
 
 def get_project(project_id: UUID) -> Project | None:
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         cursor = connection.execute(
             """
             SELECT
@@ -96,9 +100,7 @@ def get_project(project_id: UUID) -> Project | None:
 
 
 def save_experiment(project_id: UUID, experiment: Experiment):
-    check_project(project_id)
-
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         connection.execute(
             """
             INSERT INTO experiments (
@@ -117,7 +119,7 @@ def save_experiment(project_id: UUID, experiment: Experiment):
 
 
 def get_experiment(experiment_id: UUID) -> Experiment | None:
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         cursor = connection.execute(
             """
             SELECT
@@ -143,7 +145,7 @@ def get_experiment(experiment_id: UUID) -> Experiment | None:
 
 
 def save_run(run: Run):
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         connection.execute(
             """
             INSERT INTO runs (
@@ -170,7 +172,7 @@ def save_run(run: Run):
 
 
 def get_run(run_id: UUID) -> Run | None:
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         cursor = connection.execute(
             """
             SELECT
@@ -204,7 +206,7 @@ def get_run(run_id: UUID) -> Run | None:
 
 
 def get_runs() -> list[Run]:
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         cursor = connection.execute(
             """
             SELECT
@@ -240,7 +242,7 @@ def get_runs() -> list[Run]:
 
 
 def update_run_record(run: Run):
-    with sqlite3.connect(DB_PATH) as connection:
+    with get_connection() as connection:
         connection.execute(
             """
             UPDATE runs

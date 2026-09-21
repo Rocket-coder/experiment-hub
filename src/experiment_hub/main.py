@@ -8,9 +8,17 @@ from experiment_hub.storage import (
     save_run, 
     get_run as storage_get_run, 
     get_runs as storage_get_runs,
-    init_db
+    init_db,
+    save_project,
+    get_project as storage_get_project,
+    get_experiment as storage_get_experiment
 )
-from experiment_hub.service import update_run, RunNotFoundError, RunAlreadyFinishedError
+from experiment_hub.service import (
+    update_run, 
+    create_experiment as service_create_experiment, 
+    RunNotFoundError, 
+    RunAlreadyFinishedError
+)
 
 
 @asynccontextmanager
@@ -88,15 +96,14 @@ def add_project(project_create: ProjectCreate):
         name=project_create.name
     )
 
-    # TODO: save project to DB
-    # TODO: get project from DB
-    pass
+    save_project(project)
+
+    return storage_get_project(project.project_id) 
 
 
 @app.get("/projects/{project_id}")
 def get_project(project_id: UUID):
-    # TODO: add storage_get_project(project_id)
-    project = None
+    project = get_project(project_id)
 
     if project is None:
         raise HTTPException(
@@ -109,23 +116,20 @@ def get_project(project_id: UUID):
 
 @app.post("/projects/{project_id}/experiments", status_code=201)
 def create_experiment(project_id: UUID, experiment_create: ExperimentCreate):
-    project = get_project(project_id)
     experiment = Experiment(
         experiment_id=uuid4(),
         project_id=project_id,
         name=experiment_create.name
     )
 
-    # TODO: add experiment to DB
-    # TODO: get experiment from DB
+    service_create_experiment(project_id, experiment)
 
-    pass
+    return storage_get_experiment(experiment.experiment_id)
 
 
 @app.get("/experiments/{experiment_id}")
 def get_experiment(experiment_id: UUID):
-    # TODO: add storage_get_experiment(experiment_id)
-    experiment = None
+    experiment = storage_get_experiment(experiment_id)
 
     if experiment is None:
         raise HTTPException(
