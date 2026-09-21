@@ -9,6 +9,7 @@ class RunCreate(BaseModel):
     program: str
     parameters: dict[str, int | float]
 
+
 class Run(BaseModel):
     run_id: UUID
     status: Literal["running", "completed", "failed", "cancelled"]
