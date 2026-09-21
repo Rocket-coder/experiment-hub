@@ -124,6 +124,7 @@ def test_fail_run():
     assert patch_result["results"] == "bad request"
     assert patch_result["end_time"] is not None
 
+
 def test_patch_run_with_invalid_status():
     create_response = create_run()
 
@@ -162,7 +163,10 @@ def test_patch_finished_run():
     run_id = create_response.json()["run_id"]
 
     client.patch(f"/runs/{run_id}", json=update_body)
-    update_body["status"] = "failed"
+    update_body = {
+                    "status": "failed",
+                    "results": "test result"
+                }
     another_patch_response = client.patch(f"/runs/{run_id}", json=update_body)
 
     assert another_patch_response.status_code == 409
