@@ -37,7 +37,10 @@ def test_create_run():
     UUID(created_run["run_id"])    
     assert created_run["status"] == "running"
     assert created_run["program"] == "test_post.py"
-    assert created_run["parameters"] is not None
+    assert created_run["parameters"] == {
+        "learning_rate": 0.21,
+        "batch_size": 64
+    }
     assert created_run["start_time"] is not None
     assert created_run["results"] is None
     assert created_run["end_time"] is None
@@ -68,6 +71,7 @@ def test_get_run_with_invalid_uuid():
     response = client.get("/runs/123")
 
     assert response.status_code == 422
+
 
 def test_get_unknown_run():
     run_id = uuid4()
