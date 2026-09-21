@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from experiment_hub.models import Run, RunCreate, RunUpdate
 from experiment_hub.storage import runs
-
+from experiment_hub.service import update_run, RunNotFoundError, RunAlreadyFinishedError
 
 app = FastAPI()
 
@@ -52,20 +52,15 @@ async def get_run(run_id: UUID):
 
 @app.patch("/runs/{run_id}")
 async def patch_run(run_id: UUID, run_update: RunUpdate):
-    if run_id not in runs:
+    try:
+        return update_run(run_id, run_update)
+    except RunNotFoundError:
         raise HTTPException(
             status_code=404,
             detail="Run not found"
         )
-
-    if runs[run_id].status != "running":
+    except RunAlreadyFinishedError:
         raise HTTPException(
             status_code=409,
             detail="Run is already finished"
         )
-
-    runs[run_id].status = run_update.status
-    runs[run_id].results = run_update.results
-    runs[run_id].end_time = datetime.now(timezone.utc)
-
-    return runs[run_id]
