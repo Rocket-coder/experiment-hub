@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from uuid import uuid4, UUID
 from datetime import datetime, timezone
+from contextlib import asynccontextmanager
 
 from experiment_hub.models import Run, RunCreate, RunUpdate
 from experiment_hub.storage import (
@@ -11,8 +12,15 @@ from experiment_hub.storage import (
 )
 from experiment_hub.service import update_run, RunNotFoundError, RunAlreadyFinishedError
 
-app = FastAPI()
-init_db()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")

@@ -1,13 +1,18 @@
+import pytest
+
 from fastapi.testclient import TestClient
 from uuid import uuid4, UUID
 
 from experiment_hub.main import app
 
 
-client = TestClient(app)
+@pytest.fixture
+def client():
+    with TestClient(app) as client:
+        yield client
 
 
-def create_run():
+def create_run(client):
     body = {
             "program": "test_post.py",
             "parameters": {
@@ -21,8 +26,8 @@ def create_run():
     return response
 
 
-def test_create_run():
-    create_response = create_run()
+def test_create_run(client):
+    create_response = create_run(client)
 
     assert create_response.status_code == 201
 
@@ -40,7 +45,7 @@ def test_create_run():
     assert created_run["end_time"] is None
 
 
-def test_create_run_without_parameters():
+def test_create_run_without_parameters(client):
     bad_body = {
         "program": "no_params.py"
     }
@@ -50,8 +55,8 @@ def test_create_run_without_parameters():
     assert response.status_code == 422
 
 
-def test_get_run():
-    create_response = create_run()
+def test_get_run(client):
+    create_response = create_run(client)
 
     run_id = create_response.json()["run_id"]
     
@@ -61,13 +66,13 @@ def test_get_run():
     assert get_response.json() == create_response.json()
 
 
-def test_get_run_with_invalid_uuid():
+def test_get_run_with_invalid_uuid(client):
     response = client.get("/runs/123")
 
     assert response.status_code == 422
 
 
-def test_get_unknown_run():
+def test_get_unknown_run(client):
     run_id = uuid4()
 
     response = client.get(f"/runs/{run_id}")
@@ -79,8 +84,8 @@ def test_get_unknown_run():
     assert data["detail"] == "Run not found"
 
 
-def test_complete_run():
-    create_response = create_run()
+def test_complete_run(client):
+    create_response = create_run(client)
 
     update_body = {
         "status": "completed",
@@ -99,8 +104,8 @@ def test_complete_run():
     assert patch_result["end_time"] is not None
 
 
-def test_fail_run():
-    create_response = create_run()
+def test_fail_run(client):
+    create_response = create_run(client)
 
     failed_body = {
         "status": "failed",
@@ -119,8 +124,8 @@ def test_fail_run():
     assert patch_result["end_time"] is not None
 
 
-def test_patch_run_with_invalid_status():
-    create_response = create_run()
+def test_patch_run_with_invalid_status(client):
+    create_response = create_run(client)
 
     update_body = {
         "status": "unknown",
@@ -133,7 +138,7 @@ def test_patch_run_with_invalid_status():
     assert patch_response.status_code == 422
 
 
-def test_patch_unknown_run():
+def test_patch_unknown_run(client):
     update_body = {
             "status": "completed",
             "results": "test result"
@@ -146,8 +151,8 @@ def test_patch_unknown_run():
     assert patch_response.status_code == 404
 
 
-def test_patch_finished_run():
-    create_response = create_run()
+def test_patch_finished_run(client):
+    create_response = create_run(client)
 
     update_body = {
                 "status": "completed",
@@ -167,16 +172,16 @@ def test_patch_finished_run():
     assert another_patch_response.json()["detail"] == "Run is already finished"
 
 
-def test_get_runs_empty():
+def test_get_runs_empty(client):
     get_response = client.get("/runs")
 
     assert get_response.status_code == 200
     assert get_response.json() == []
 
 
-def test_get_runs():
-    create_run()
-    create_run()
+def test_get_runs(client):
+    create_run(client)
+    create_run(client)
 
     get_response = client.get("/runs")
 
