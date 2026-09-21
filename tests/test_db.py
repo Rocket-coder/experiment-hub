@@ -20,6 +20,6 @@ def test_init_and_save_runs_with_get():
 
     loaded_run = storage.get_run(run.run_id)
 
-    assert loaded_run is not None
+    assert loaded_run == run
 
     print(loaded_run)

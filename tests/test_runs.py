@@ -1,9 +1,7 @@
-import pytest
 from fastapi.testclient import TestClient
 from uuid import uuid4, UUID
 
 from experiment_hub.main import app
-from experiment_hub import storage
 
 
 client = TestClient(app)
