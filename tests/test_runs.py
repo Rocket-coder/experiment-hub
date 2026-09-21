@@ -83,3 +83,69 @@ def test_get_unknown_run():
     data = response.json()
 
     assert data["detail"] == "Run not found"
+
+
+def test_complete_run():
+    create_response = create_run()
+
+    update_body = {
+        "status": "completed",
+        "results": "test result"
+    }
+
+    run_id = create_response.json()["run_id"]
+    patch_response = client.patch(f"/runs/{run_id}", json=update_body)
+
+    assert patch_response.status_code == 200
+
+    patch_result = patch_response.json()
+
+    assert patch_result["status"] == "completed"
+    assert patch_result["results"] == "test result"
+    assert patch_result["end_time"] is not None
+
+
+def test_fail_run():
+    create_response = create_run()
+
+    update_body = {
+        "status": "unknown",
+        "results": "bad request"
+    }
+
+    run_id = create_response.json()["run_id"]
+    patch_response = client.patch(f"/runs/{run_id}", json=update_body)
+
+    assert patch_response.status_code == 422
+
+
+def test_patch_unknown_run():
+    create_response = create_run()
+
+    update_body = {
+            "status": "completed",
+            "results": "test result"
+        }
+
+    run_id = uuid4()
+
+    patch_response = client.patch(f"/runs/{run_id}", json=update_body)
+
+    assert patch_response.status_code == 404
+
+
+def test_patch_finished_run():
+    create_response = create_run()
+
+    update_body = {
+                "status": "completed",
+                "results": "test result"
+            }
+
+    run_id = create_response.json()["run_id"]
+
+    patch_response = client.patch(f"/runs/{run_id}", json=update_body)
+    another_patch_response = client.patch(f"/runs/{run_id}", json=update_body)
+
+    assert another_patch_response.status_code == 409
+    assert another_patch_response.json()["detail"] == f"Run {run_id} was already end"
