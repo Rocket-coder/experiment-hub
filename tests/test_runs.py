@@ -1,15 +1,4 @@
-import pytest
-
-from fastapi.testclient import TestClient
 from uuid import uuid4, UUID
-
-from experiment_hub.main import app
-
-
-@pytest.fixture
-def client():
-    with TestClient(app) as client:
-        yield client
 
 
 def create_run(client):
