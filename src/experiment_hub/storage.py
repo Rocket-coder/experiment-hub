@@ -5,6 +5,7 @@ from uuid import UUID
 from datetime import datetime
 
 from experiment_hub.models import Run, Project, Experiment
+from experiment_hub.service import check_project
 
 
 DB_PATH = Path("database/runs.db")
@@ -44,9 +45,10 @@ def init_db():
         connection.execute(
             """
             CREATE TABLE IF NOT EXISTS experiments (
-            experiment_id TEXT PRIMARY KEY,
-            project_id TEXT FOREIGN KEY,
-            name TEXT NOT NULL
+                experiment_id TEXT PRIMARY KEY,
+                project_id TEXT NOT NULL,
+                name TEXT NOT NULL,
+                FOREIGN KEY (project_id) REFERENCES projects(project_id)
             )
             """
         )       
@@ -94,12 +96,7 @@ def get_project(project_id: UUID) -> Project | None:
 
 
 def save_experiment(project_id: UUID, experiment: Experiment):
-    project = get_project(project_id)
-
-    if project is None:
-        # TODO: add error for no project
-        raise
-
+    check_project(project_id)
 
     with sqlite3.connect(DB_PATH) as connection:
         connection.execute(
@@ -108,8 +105,8 @@ def save_experiment(project_id: UUID, experiment: Experiment):
                 experiment_id,
                 project_id,
                 name
-            VALUES (?, ?, ?)
             )
+            VALUES (?, ?, ?)
             """,
             (
                 str(experiment.experiment_id),
