@@ -3,10 +3,16 @@ from uuid import uuid4, UUID
 from datetime import datetime, timezone
 
 from experiment_hub.models import Run, RunCreate, RunUpdate
-from experiment_hub.storage import save_run, get_run, get_runs
+from experiment_hub.storage import (
+    save_run, 
+    get_run as storage_get_run, 
+    get_runs as storage_get_runs,
+    init_db
+)
 from experiment_hub.service import update_run, RunNotFoundError, RunAlreadyFinishedError
 
 app = FastAPI()
+init_db()
 
 
 @app.get("/")
@@ -21,7 +27,7 @@ async def health():
 
 @app.get("/runs")
 async def get_runs():
-    return get_runs()
+    return storage_get_runs()
 
 
 @app.post("/runs", status_code=201)
@@ -36,12 +42,12 @@ async def create_run(run_create: RunCreate):
 
     save_run(run)
     
-    return get_run(run.run_id)
+    return storage_get_run(run.run_id)
 
 
 @app.get("/runs/{run_id}")
 async def get_run(run_id: UUID):
-    run = get_run(run_id)
+    run = storage_get_run(run_id)
     if run is None:
         raise HTTPException(
             status_code=404,

@@ -89,26 +89,23 @@ def get_run(run_id: UUID) -> Run | None:
     )
 
 
-def get_runs() -> list[Run] | None:
+def get_runs() -> list[Run]:
     with sqlite3.connect(DB_PATH) as connection:
-            cursor = connection.execute(
-                """
-                SELECT
-                    run_id,
-                    status,
-                    start_time,
-                    program,
-                    parameters,
-                    results,
-                    end_time
-                FROM runs
-                """
-            )
+        cursor = connection.execute(
+            """
+            SELECT
+                run_id,
+                status,
+                start_time,
+                program,
+                parameters,
+                results,
+                end_time
+            FROM runs
+            """
+        )
     
-            all_runs = cursor.fetchall()
-    
-    if all_runs is None:
-        return None
+        all_runs = cursor.fetchall()
 
     runs = []
 
@@ -125,4 +122,24 @@ def get_runs() -> list[Run] | None:
             )
         )
 
-    return runs.values()
+    return runs
+
+
+def update_run_record(run: Run):
+    with sqlite3.connect(DB_PATH) as connection:
+        connection.execute(
+            """
+            UPDATE runs
+            SET
+                status = ?,
+                results = ?,
+                end_time = ?
+            WHERE run_id = ?
+            """,
+            (
+                run.status,
+                run.results,
+                run.end_time.isoformat(),
+                str(run.run_id)
+            )
+        )
