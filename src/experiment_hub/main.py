@@ -69,13 +69,13 @@ async def patch_run(run_id: UUID, run_update: RunUpdate):
     if run_id not in runs:
         raise HTTPException(
             status_code=404,
-            detail="Run not Found"
+            detail="Run not found"
         )
 
     if runs[run_id].status != "running":
         raise HTTPException(
             status_code=409,
-            detail=f"Run {run_id} was already end"
+            detail="Run is already finished"
         )
 
     runs[run_id].status = run_update.status
