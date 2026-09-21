@@ -5,6 +5,26 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
+class ProjectCreate(BaseModel):
+    name: str
+
+
+class Project(BaseModel):
+    project_id: UUID
+    name: str
+
+
+class ExperimentCreate(BaseModel):
+    project_id: UUID
+    name: str
+
+
+class Experiment(BaseModel):
+    experiment_id: UUID
+    project_id: UUID
+    name: str
+
+
 class RunCreate(BaseModel):
     program: str
     parameters: dict[str, int | float]
