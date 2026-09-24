@@ -28,11 +28,11 @@ def test_init_and_save_runs_with_get():
 
 
 def test_cannot_save_experiment_without_project():
-    experimnet = Experiment(
+    experiment = Experiment(
         experiment_id=uuid4(),
         project_id=uuid4(),
         name="Test Experiment"
     )
 
     with pytest.raises(sqlite3.IntegrityError):
-        storage.save_experiment(experimnet)
+        storage.save_experiment(experiment)
