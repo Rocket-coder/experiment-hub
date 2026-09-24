@@ -75,4 +75,4 @@ def test_try_to_get_experiment_with_unknown_uuid(client):
 def test_try_to_get_experiment_with_invalid_uuid(client):
     get_response = client.get("/experiments/321")
 
-    assert get_response.status_code == 422 
+    assert get_response.status_code == 422
