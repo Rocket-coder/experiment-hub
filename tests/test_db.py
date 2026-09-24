@@ -1,8 +1,10 @@
+import sqlite3
+import pytest
 from uuid import uuid4
 from datetime import datetime, timezone
 
 from experiment_hub import storage
-from experiment_hub.models import Run
+from experiment_hub.models import Run, Experiment
 
 def test_init_and_save_runs_with_get():
     run = Run(
@@ -23,3 +25,14 @@ def test_init_and_save_runs_with_get():
     assert loaded_run == run
 
     print(loaded_run)
+
+
+def test_cannot_save_experiment_without_project():
+    experimnet = Experiment(
+        experiment_id=uuid4(),
+        project_id=uuid4(),
+        name="Test Experiment"
+    )
+
+    with pytest.raises(sqlite3.IntegrityError):
+        storage.save_experiment(experimnet)
