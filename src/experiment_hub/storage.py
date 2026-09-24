@@ -25,12 +25,14 @@ def init_db():
             """
             CREATE TABLE IF NOT EXISTS runs (
             run_id TEXT PRIMARY KEY,
+            experiment_id TEXT NOT NULL
             status TEXT NOT NULL,
             start_time TEXT NOT NULL,
             program TEXT NOT NULL,
             parameters TEXT NOT NULL,
             results TEXT,
             end_time TEXT
+            FOREIGN KEY (experiment_id) REFERENCES experiments(experiment_id)
             )
             """
         )
@@ -150,6 +152,7 @@ def save_run(run: Run):
             """
             INSERT INTO runs (
                 run_id,
+                experiment_id,
                 status,
                 start_time,
                 program,
@@ -157,10 +160,11 @@ def save_run(run: Run):
                 results,
                 end_time
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 str(run.run_id),
+                str(run.experiment_id),
                 run.status,
                 run.start_time.isoformat(),
                 run.program,
@@ -177,6 +181,7 @@ def get_run(run_id: UUID) -> Run | None:
             """
             SELECT
                 run_id,
+                experiment_id,
                 status,
                 start_time,
                 program,
@@ -196,12 +201,13 @@ def get_run(run_id: UUID) -> Run | None:
 
     return Run(
         run_id=UUID(row[0]),
-        status=row[1],
-        start_time=datetime.fromisoformat(row[2]),
-        program=row[3],
-        parameters=json.loads(row[4]),
-        results=row[5],
-        end_time=datetime.fromisoformat(row[6]) if row[6] else None
+        experiment_id=UUID(row[1]),
+        status=row[2],
+        start_time=datetime.fromisoformat(row[3]),
+        program=row[4],
+        parameters=json.loads(row[5]),
+        results=row[6],
+        end_time=datetime.fromisoformat(row[7]) if row[7] else None
     )
 
 
@@ -211,6 +217,7 @@ def get_runs() -> list[Run]:
             """
             SELECT
                 run_id,
+                experiment_id,
                 status,
                 start_time,
                 program,
@@ -229,12 +236,13 @@ def get_runs() -> list[Run]:
         runs.append(
             Run(
                 run_id=UUID(run[0]),
-                status=run[1],
-                start_time=datetime.fromisoformat(run[2]),
-                program=run[3],
-                parameters=json.loads(run[4]),
-                results=run[5],
-                end_time=datetime.fromisoformat(run[6]) if run[6] else None
+                experiment_id=UUID(run[1]),
+                status=run[2],
+                start_time=datetime.fromisoformat(run[3]),
+                program=run[4],
+                parameters=json.loads(run[5]),
+                results=run[6],
+                end_time=datetime.fromisoformat(run[7]) if run[7] else None
             )
         )
 

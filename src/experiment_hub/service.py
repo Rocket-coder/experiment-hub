@@ -1,8 +1,9 @@
+from experiment_hub.main import get_experiment
 from uuid import UUID
 from datetime import datetime, timezone
 
 from experiment_hub.models import Run, RunUpdate, Experiment
-from experiment_hub.storage import get_run, update_run_record, get_project, save_experiment
+from experiment_hub.storage import get_run, update_run_record, get_project, save_experiment, get_experiment, save_run
 
 
 class RunNotFoundError(Exception):
@@ -15,6 +16,21 @@ class RunAlreadyFinishedError(Exception):
 
 class ProjectNotFoundError(Exception):
     pass
+
+
+class ExperimentNotFoundError(Exception):
+    pass
+
+
+def create_run(experiment_id, run: Run) -> Run:
+    experiment = get_experiment(experiment_id)
+
+    if experiment is None:
+        raise ExperimentNotFoundError
+    
+    save_run(run)
+
+    return run
 
 
 def update_run(run_id: UUID, run_update: RunUpdate) -> Run:

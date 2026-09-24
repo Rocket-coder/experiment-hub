@@ -5,7 +5,6 @@ from contextlib import asynccontextmanager
 
 from experiment_hub.models import Run, RunCreate, RunUpdate, Project, ProjectCreate, Experiment, ExperimentCreate
 from experiment_hub.storage import (
-    save_run, 
     get_run as storage_get_run, 
     get_runs as storage_get_runs,
     init_db,
@@ -14,6 +13,7 @@ from experiment_hub.storage import (
     get_experiment as storage_get_experiment
 )
 from experiment_hub.service import (
+    create_run as service_create_run,
     update_run, 
     create_experiment as service_create_experiment, 
     RunNotFoundError, 
@@ -47,19 +47,19 @@ async def get_runs():
     return storage_get_runs()
 
 
-@app.post("/runs", status_code=201)
-async def create_run(run_create: RunCreate):
+@app.post("/experiments/{experiment_id}/runs", status_code=201)
+async def create_run(experiment_id: UUID, run_create: RunCreate):
     run = Run(
         run_id = uuid4(),
+        experiment_id=experiment_id,
         status = "running",
         start_time = datetime.now(timezone.utc),
         program = run_create.program,
         parameters = run_create.parameters
     )
 
-    save_run(run)
     
-    return storage_get_run(run.run_id)
+    return service_create_run(run.experiment_id, run)
 
 
 @app.get("/runs/{run_id}")
@@ -91,7 +91,7 @@ async def patch_run(run_id: UUID, run_update: RunUpdate):
 
 
 @app.post("/projects", status_code=201)
-def add_project(project_create: ProjectCreate):
+def create_project(project_create: ProjectCreate):
     project = Project(
         project_id=uuid4(),
         name=project_create.name

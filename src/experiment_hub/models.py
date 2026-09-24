@@ -31,6 +31,7 @@ class RunCreate(BaseModel):
 
 class Run(BaseModel):
     run_id: UUID
+    experiment_id: UUID
     status: Literal["running", "completed", "failed", "cancelled"]
     start_time: datetime
     program: str
