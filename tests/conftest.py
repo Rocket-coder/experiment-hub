@@ -1,5 +1,3 @@
-import py
-import json
 import pytest
 
 from fastapi.testclient import TestClient
@@ -8,7 +6,7 @@ from uuid import uuid4
 
 from experiment_hub import storage
 from experiment_hub.main import app
-from experiment_hub.models import Run, Experiment, Project
+from experiment_hub.models import Experiment, Project
 
 
 @pytest.fixture

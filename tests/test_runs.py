@@ -29,6 +29,20 @@ def test_create_run_without_parameters(client, api_experiment):
     assert response.status_code == 422
 
 
+def test_create_run_with_unknown_project(client):
+    body = {
+        "program": "params?",
+        "parameters": {
+            "param1": 2.5
+        }
+    }
+
+    response = client.post(f"/experiments/{uuid4()}/runs", json=body)
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Experiment not found"
+
+
 def test_get_run(client, api_run):
     run_id = api_run["run_id"]
     

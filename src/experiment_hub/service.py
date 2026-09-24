@@ -25,7 +25,7 @@ def create_run(run: Run) -> Run:
     experiment = get_experiment(run.experiment_id)
 
     if experiment is None:
-        raise ExperimentNotFoundError
+        raise ExperimentNotFoundError()
     
     save_run(run)
 
