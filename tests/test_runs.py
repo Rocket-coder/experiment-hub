@@ -29,7 +29,7 @@ def test_create_run_without_parameters(client, api_experiment):
     assert response.status_code == 422
 
 
-def test_create_run_with_unknown_project(client):
+def test_create_run_with_unknown_experiment(client):
     body = {
         "program": "params?",
         "parameters": {

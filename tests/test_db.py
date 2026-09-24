@@ -60,3 +60,19 @@ def test_cannot_save_experiment_without_project():
 
     with pytest.raises(sqlite3.IntegrityError):
         storage.save_experiment(experiment)
+
+
+def test_cannot_save_run_without_experiment():
+    run = Run(
+        run_id=uuid4(),
+        experiment_id=uuid4(),
+        status="running",
+        start_time=datetime.now(timezone.utc),
+        program="test_db.py",
+        parameters={
+            "param1": 2.5
+        }
+    )
+
+    with pytest.raises(sqlite3.IntegrityError):
+        storage.save_run(run)
