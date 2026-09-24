@@ -35,13 +35,13 @@ def update_run(run_id: UUID, run_update: RunUpdate) -> Run:
     return run
 
 
-def create_experiment(project_id: UUID, experiment: Experiment) -> Experiment:
-    project = get_project(project_id)
+def create_experiment(experiment: Experiment) -> Experiment:
+    project = get_project(experiment.project_id)
 
     if project is None:
         raise ProjectNotFoundError()
 
-    save_experiment(project_id, experiment)
+    save_experiment(experiment)
 
     return experiment
     

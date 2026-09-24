@@ -99,7 +99,7 @@ def get_project(project_id: UUID) -> Project | None:
     )
 
 
-def save_experiment(project_id: UUID, experiment: Experiment):
+def save_experiment(experiment: Experiment):
     with get_connection() as connection:
         connection.execute(
             """
@@ -112,7 +112,7 @@ def save_experiment(project_id: UUID, experiment: Experiment):
             """,
             (
                 str(experiment.experiment_id),
-                str(project_id),
+                str(experiment.project_id),
                 experiment.name
             )
         )

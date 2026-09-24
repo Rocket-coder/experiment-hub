@@ -124,7 +124,7 @@ def create_experiment(project_id: UUID, experiment_create: ExperimentCreate):
     )
 
     try:
-        return service_create_experiment(project_id, experiment)
+        return service_create_experiment(experiment)
     except ProjectNotFoundError:
         raise HTTPException(
             status_code=404,

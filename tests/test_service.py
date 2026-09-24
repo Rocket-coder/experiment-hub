@@ -77,7 +77,7 @@ def test_create_experiment_with_real_project():
         name="test experiment"
     )
 
-    saved_experiment = create_experiment(project.project_id, experiment)
+    saved_experiment = create_experiment(experiment)
 
     assert saved_experiment.experiment_id == experiment.experiment_id
     assert saved_experiment.project_id == experiment.project_id
@@ -92,4 +92,4 @@ def test_try_to_create_experiment_with_unknown_project():
     )
 
     with pytest.raises(ProjectNotFoundError):
-        create_experiment(experiment.project_id, experiment)
+        create_experiment(experiment)
