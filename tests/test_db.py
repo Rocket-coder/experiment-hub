@@ -7,7 +7,7 @@ from experiment_hub import storage
 from experiment_hub.models import Run, Experiment, Project
 
 
-def test_init_and_save_runs_with_get(experiment):
+def test_save_and_get_run(experiment):
     run = Run(
         run_id=uuid4(),
         experiment_id=experiment.experiment_id,
