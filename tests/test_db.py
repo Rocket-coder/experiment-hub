@@ -4,7 +4,7 @@ from uuid import uuid4
 from datetime import datetime, timezone
 
 from experiment_hub import storage
-from experiment_hub.models import Run, Experiment
+from experiment_hub.models import Run, Experiment, Project
 
 def test_init_and_save_runs_with_get():
     run = Run(
@@ -24,7 +24,51 @@ def test_init_and_save_runs_with_get():
 
     assert loaded_run == run
 
-    print(loaded_run)
+
+def test_get_unknown_run():
+    assert storage.get_run(uuid4()) is None
+
+
+def test_create_project():
+    project = Project(
+        project_id=uuid4(),
+        name="Test New Project"
+    )
+
+    storage.save_project(project)
+
+    db_project = storage.get_project(project.project_id)
+
+    assert project == db_project
+
+
+def test_save_experiment():
+    project = Project(
+        project_id=uuid4(),
+        name="Project for Experiment"
+    )
+
+    storage.save_project(project)
+
+    experiment = Experiment(
+        experiment_id=uuid4(),
+        project_id=project.project_id,
+        name="New Exp"
+    )
+
+    storage.save_experiment(experiment)
+
+    db_experiment = storage.get_experiment(experiment.experiment_id)
+
+    assert experiment == db_experiment
+
+
+def test_get_unknown_project():
+    assert storage.get_project(uuid4()) is None
+
+
+def test_get_unknown_experiment():
+    assert storage.get_experiment(uuid4()) is None
 
 
 def test_cannot_save_experiment_without_project():
