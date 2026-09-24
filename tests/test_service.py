@@ -5,12 +5,15 @@ from datetime import datetime, timezone
 
 from experiment_hub import storage
 from experiment_hub.models import Run, RunUpdate, Experiment, Project
-from experiment_hub.service import update_run, create_experiment, RunAlreadyFinishedError, ProjectNotFoundError
+from experiment_hub.service import create_run, update_run, create_experiment, RunAlreadyFinishedError, ProjectNotFoundError
 
 
 def test_update_running_to_completed():
+    experiment_id = create_test_experiment().experiment_id
+
     run = Run(
         run_id = uuid4(),
+        experiment_id=experiment_id,
         status = "running",
         start_time = datetime.now(timezone.utc),
         program = "unit_test.py",
@@ -35,8 +38,11 @@ def test_update_running_to_completed():
 
 
 def test_try_to_update_finished_run():
+    experiment_id = create_test_experiment().experiment_id
+
     run = Run(
             run_id = uuid4(),
+            experiment_id=experiment_id,
             status = "running",
             start_time = datetime.now(timezone.utc),
             program = "unit_test.py",
