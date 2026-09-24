@@ -20,23 +20,6 @@ def init_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     
     with get_connection() as connection:
-        # Table runs init
-        connection.execute(
-            """
-            CREATE TABLE IF NOT EXISTS runs (
-            run_id TEXT PRIMARY KEY,
-            experiment_id TEXT NOT NULL
-            status TEXT NOT NULL,
-            start_time TEXT NOT NULL,
-            program TEXT NOT NULL,
-            parameters TEXT NOT NULL,
-            results TEXT,
-            end_time TEXT
-            FOREIGN KEY (experiment_id) REFERENCES experiments(experiment_id)
-            )
-            """
-        )
-
         # Table projects init
         connection.execute(
             """
@@ -57,7 +40,24 @@ def init_db():
                 FOREIGN KEY (project_id) REFERENCES projects(project_id)
             )
             """
-        )       
+        )     
+
+        # Table runs init
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS runs (
+            run_id TEXT PRIMARY KEY,
+            experiment_id TEXT NOT NULL,
+            status TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            program TEXT NOT NULL,
+            parameters TEXT NOT NULL,
+            results TEXT,
+            end_time TEXT,
+            FOREIGN KEY (experiment_id) REFERENCES experiments(experiment_id)
+            )
+            """
+        )  
 
 
 def save_project(project: Project):

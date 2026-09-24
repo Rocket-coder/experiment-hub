@@ -90,10 +90,10 @@ def api_run(client, api_experiment):
                 "batch_size": 64
             }
         }
-    project_id = api_experiment["project_id"]
+
     experiment_id = api_experiment["experiment_id"]
     
-    response = client.post(f"/projects/{project_id}/experiments/{experiment_id}/runs", json=body)
+    response = client.post(f"/experiments/{experiment_id}/runs", json=body)
 
     assert response.status_code == 201
 

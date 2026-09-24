@@ -17,12 +17,14 @@ def test_create_run(api_run):
     assert created_run["end_time"] is None
 
 
-def test_create_run_without_parameters(client):
+def test_create_run_without_parameters(client, api_experiment):
     bad_body = {
         "program": "no_params.py"
     }
 
-    response = client.post("/runs", json=bad_body)
+    experiment_id = api_experiment["experiment_id"]
+
+    response = client.post(f"/experiments/{experiment_id}/runs", json=bad_body)
 
     assert response.status_code == 422
 

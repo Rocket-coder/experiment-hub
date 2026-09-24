@@ -1,4 +1,3 @@
-from experiment_hub.main import get_experiment
 from uuid import UUID
 from datetime import datetime, timezone
 
@@ -22,8 +21,8 @@ class ExperimentNotFoundError(Exception):
     pass
 
 
-def create_run(experiment_id, run: Run) -> Run:
-    experiment = get_experiment(experiment_id)
+def create_run(run: Run) -> Run:
+    experiment = get_experiment(run.experiment_id)
 
     if experiment is None:
         raise ExperimentNotFoundError

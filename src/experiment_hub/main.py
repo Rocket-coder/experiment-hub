@@ -18,7 +18,8 @@ from experiment_hub.service import (
     create_experiment as service_create_experiment, 
     RunNotFoundError, 
     RunAlreadyFinishedError,
-    ProjectNotFoundError
+    ProjectNotFoundError,
+    ExperimentNotFoundError
 )
 
 
@@ -58,8 +59,13 @@ async def create_run(experiment_id: UUID, run_create: RunCreate):
         parameters = run_create.parameters
     )
 
-    
-    return service_create_run(run.experiment_id, run)
+    try:
+        return service_create_run(run)
+    except ExperimentNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Experiment not found"
+        )
 
 
 @app.get("/runs/{run_id}")
