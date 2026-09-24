@@ -8,12 +8,10 @@ from experiment_hub.models import Run, RunUpdate, Experiment, Project
 from experiment_hub.service import create_run, update_run, create_experiment, RunAlreadyFinishedError, ProjectNotFoundError
 
 
-def test_update_running_to_completed():
-    experiment_id = create_test_experiment().experiment_id
-
+def test_update_running_to_completed(experiment):
     run = Run(
         run_id = uuid4(),
-        experiment_id=experiment_id,
+        experiment_id=experiment.experiment_id,
         status = "running",
         start_time = datetime.now(timezone.utc),
         program = "unit_test.py",
@@ -37,12 +35,10 @@ def test_update_running_to_completed():
     assert updated_run.end_time is not None
 
 
-def test_try_to_update_finished_run():
-    experiment_id = create_test_experiment().experiment_id
-
+def test_try_to_update_finished_run(experiment):
     run = Run(
             run_id = uuid4(),
-            experiment_id=experiment_id,
+            experiment_id=experiment.experiment_id,
             status = "running",
             start_time = datetime.now(timezone.utc),
             program = "unit_test.py",
@@ -69,14 +65,7 @@ def test_try_to_update_finished_run():
         update_run(run.run_id, update)
 
 
-def test_create_experiment_with_real_project():
-    project = Project(
-        project_id=uuid4(),
-        name="test project"
-    )
-
-    storage.save_project(project)
-
+def test_create_experiment_with_real_project(project):
     experiment = Experiment(
         experiment_id=uuid4(),
         project_id=project.project_id,

@@ -7,9 +7,10 @@ from experiment_hub import storage
 from experiment_hub.models import Run, Experiment, Project
 
 
-def test_init_and_save_runs_with_get():
+def test_init_and_save_runs_with_get(experiment):
     run = Run(
         run_id=uuid4(),
+        experiment_id=experiment.experiment_id,
         status="running",
         start_time=datetime.now(timezone.utc),
         program="test_db.py",
@@ -30,35 +31,13 @@ def test_get_unknown_run():
     assert storage.get_run(uuid4()) is None
 
 
-def test_create_project():
-    project = Project(
-        project_id=uuid4(),
-        name="Test New Project"
-    )
-
-    storage.save_project(project)
-
+def test_create_project(project):
     db_project = storage.get_project(project.project_id)
 
     assert project == db_project
 
 
-def test_save_experiment():
-    project = Project(
-        project_id=uuid4(),
-        name="Project for Experiment"
-    )
-
-    storage.save_project(project)
-
-    experiment = Experiment(
-        experiment_id=uuid4(),
-        project_id=project.project_id,
-        name="New Exp"
-    )
-
-    storage.save_experiment(experiment)
-
+def test_save_experiment(experiment):
     db_experiment = storage.get_experiment(experiment.experiment_id)
 
     assert experiment == db_experiment

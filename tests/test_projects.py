@@ -1,25 +1,11 @@
 from uuid import uuid4, UUID
 
 
-def create_project(client):
-    body = {
-        "name": "test project"
-    }
-
-    response = client.post("/projects", json=body)
-
-    return response
-
-
-def test_create_project(client):
-    create_response = create_project(client)
-
-    assert create_response.status_code == 201
-
-    created_project = create_response.json()
+def test_create_project(api_project):
+    created_project = api_project
 
     UUID(created_project["project_id"])
-    assert created_project["name"] == "test project"
+    assert created_project["name"] == "Test Project"
 
 
 def test_try_to_create_project_without_name(client):
@@ -28,15 +14,12 @@ def test_try_to_create_project_without_name(client):
     assert response.status_code == 422
 
 
-def test_get_project(client):
-    create_response = create_project(client)
-
-    project_id = create_response.json()["project_id"]
-
+def test_get_project(client, api_project):
+    project_id = api_project["project_id"]
     get_response = client.get(f"/projects/{project_id}")
 
     assert get_response.status_code == 200
-    assert get_response.json() == create_response.json()
+    assert get_response.json() == api_project
 
 
 def test_get_project_with_invalid_uuid(client):

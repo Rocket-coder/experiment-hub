@@ -1,3 +1,5 @@
+import py
+import json
 import pytest
 
 from fastapi.testclient import TestClient
@@ -28,7 +30,8 @@ def test_database(tmp_path, monkeypatch):
     storage.init_db()
 
 
-def create_test_project() -> Project:
+@pytest.fixture
+def project() -> Project:
     project = Project(
         project_id=uuid4(),
         name="XZ name"
@@ -39,15 +42,59 @@ def create_test_project() -> Project:
     return project
 
 
-def create_test_experiment() -> Experiment:
-    project_id = create_test_project().project_id
-
+@pytest.fixture
+def experiment(project) -> Experiment:
     experiment = Experiment(
         experiment_id=uuid4(),
-        project_id=project_id,
+        project_id=project.project_id,
         name="Xz exp"
     )
 
     storage.save_experiment(experiment)
 
     return experiment
+
+
+@pytest.fixture
+def api_project(client):
+    response = client.post(
+        "/projects",
+        json={"name": "Test Project"}
+    )
+
+    assert response.status_code == 201
+
+    return response.json()
+
+
+@pytest.fixture
+def api_experiment(client, api_project):
+    project_id = api_project["project_id"]
+
+    response = client.post(
+        f"/projects/{project_id}/experiments",
+        json={"name": "Test experiment"}
+    )
+
+    assert response.status_code == 201
+
+    return response.json()
+
+
+@pytest.fixture
+def api_run(client, api_experiment):
+    body = {
+            "program": "test_post.py",
+            "parameters": {
+                "learning_rate": 0.21,
+                "batch_size": 64
+            }
+        }
+    project_id = api_experiment["project_id"]
+    experiment_id = api_experiment["experiment_id"]
+    
+    response = client.post(f"/projects/{project_id}/experiments/{experiment_id}/runs", json=body)
+
+    assert response.status_code == 201
+
+    return response.json()
